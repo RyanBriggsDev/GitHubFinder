@@ -1,20 +1,21 @@
 import React, { useEffect, useContext } from 'react'
-import { FaCodepen, FaStore, FaUserFriends, FaUsers, FaCode} from 'react-icons/fa'
+import { FaStore, FaUserFriends, FaUsers, FaCode} from 'react-icons/fa'
 import { Link, useParams } from 'react-router-dom'
 import GithubContext from '../../context/github/GithubContext'
 import Loading from '../layout/Loading'
+import RepoList from '../repos/RepoList'
 import { FaSpinner } from 'react-icons/fa'
 import { hydrate } from 'react-dom'
 
-
 function User() {
 
-  const {getUser, user, loading} = useContext(GithubContext)
+  const {getUser, user, loading, getUserRepos, repos} = useContext(GithubContext)
   
   const params = useParams()
 
   useEffect(() => {
     getUser(params.login)
+    getUserRepos(params.login)
   }, [])
 
   // destructure user data into their own variables
@@ -151,8 +152,8 @@ function User() {
                     {public_gists}
                 </div>
             </div>
-
         </div>
+        <RepoList repos={repos}/>
     </div>
   </>
 }

@@ -29,7 +29,7 @@ function UserSearch() {
                 <div className="form-control">
                     <div className="relative">
                         <input className="w-full pr-40 bg-gray-200 input input-lg text-black" 
-                        placeholder='Search' 
+                        placeholder='Search by Username' 
                         value={text}
                         onChange={handleChange}
                         />

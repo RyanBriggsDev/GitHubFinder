@@ -1,3 +1,5 @@
+import { data } from "autoprefixer"
+
 const GithubReducer = (state, action) => {
     switch (action.type) {
         case 'GET_USERS':
@@ -15,6 +17,12 @@ const GithubReducer = (state, action) => {
             return {
                 ...state,
                 user: action.payload,
+                loading: false,
+            }
+        case 'GET_USER_REPOS':
+            return {
+                ...state,
+                repos: action.payload,
                 loading: false,
             }
         case 'CLEAR_USERS':
