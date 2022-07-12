@@ -4,22 +4,26 @@ import { Link, useParams } from 'react-router-dom'
 import GithubContext from '../../context/github/GithubContext'
 import Loading from '../layout/Loading'
 import RepoList from '../repos/RepoList'
-import { FaSpinner } from 'react-icons/fa'
-import { hydrate } from 'react-dom'
+import { getUserAndRepos } from '../../context/github/GithubActions'
 
 function User() {
 
-  const {getUser, user, loading, getUserRepos, repos} = useContext(GithubContext)
+  const {user, loading, repos, dispatch} = useContext(GithubContext)
   
   const params = useParams()
-
+  
   useEffect(() => {
-    getUser(params.login)
-    getUserRepos(params.login)
-  }, [])
+      dispatch({type: 'SET_LOADING'})
+      const getUserData = async() => {
+        const userData = await getUserAndRepos(params.login)
+        dispatch({ type: 'GET_USER_AND_REPOS', payload: userData })   
+      }
+      getUserData()
+
+  }, [dispatch, params.login])
 
   // destructure user data into their own variables
-  const {
+  const { 
       name,
       type,
       avatar_url,
