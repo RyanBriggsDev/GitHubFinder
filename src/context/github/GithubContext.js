@@ -1,4 +1,5 @@
 import { createContext, useReducer } from "react";
+import { createRenderer } from "react-dom/test-utils";
 import GithubReducer from "./GithubReducer";
 
 const GithubContext = createContext()
@@ -10,7 +11,9 @@ export const GithubProvider = ({ children }) => {
 
     const initialState = {
         users: [],
-        loading: false
+        loading: false,
+        repos: [],
+        user: {},
     }
 
     const [state, dispatch] = useReducer(GithubReducer, initialState)
@@ -34,6 +37,50 @@ export const GithubProvider = ({ children }) => {
             payload: items
         })
     }
+
+        // get user results
+        const getUser = async (login) => {
+            setLoading()
+            const response = await fetch(`${GITHUB_URL}/users/${login}`, {
+                headers: {
+                    Authorization: `token ${GITHUB_TOKEN}`
+                }
+            })
+            if (response.status === 404) { 
+                window.location = '/notfound' 
+            } else {
+                const data = await response.json()
+                // once we have the data, assign it to users
+                dispatch({
+                    type: 'GET_USER',
+                    payload: data
+                })
+            }    
+        }
+
+        // get user repos
+        const getUserRepos = async (login) => {
+            setLoading()
+
+            const params = new URLSearchParams({
+                sort: "created",
+                per_page: 10,
+            })
+
+            const response = await fetch(`${GITHUB_URL}/users/${login}/repos?${params}`, {
+                headers: {
+                    Authorization: `token ${GITHUB_TOKEN}`
+                }
+            })
+    
+            const data = await response.json()
+            // once we have the data, assign it to users
+            dispatch({
+                type: 'GET_USER_REPOS',
+                payload: data
+            })
+        }
+    
     
     // clear users from state
     const clearUsers = () => { dispatch({type: 'CLEAR_USERS'})
@@ -45,8 +92,12 @@ export const GithubProvider = ({ children }) => {
     return <GithubContext.Provider value={{
         users: state.users,
         loading: state.loading,
+        user: state.user,
+        repos: state.repos,
         searchUsers,
-        clearUsers
+        clearUsers,
+        getUser,
+        getUserRepos,
     }}>
         {children}
     </GithubContext.Provider>
